@@ -1,0 +1,2 @@
+import { Text,View } from 'react-native';
+export function MessageBubble({item,mine}:{item:any;mine:boolean}){return <View style={{alignSelf:mine?'flex-end':'flex-start',maxWidth:'82%',backgroundColor:mine?'#60A5FA':'#F5F5F5',padding:12,borderRadius:18,marginBottom:8}}><Text style={{color:mine?'#fff':'#111',fontSize:15,lineHeight:21}}>{item.content}</Text><Text style={{fontSize:10,color:mine?'#EAF4FF':'#6B7280',marginTop:4}}>{new Date(item.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}{mine&&item.read_at?' · Read':''}</Text></View>}

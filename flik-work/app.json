@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Flik",
+    "slug": "flik",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "flik",
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-image-picker",
+      "expo-video",
+      "expo-notifications"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.flik.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Flik uses your camera when you choose to create photo or video posts.",
+        "NSMicrophoneUsageDescription": "Flik uses your microphone when you record video posts.",
+        "NSPhotoLibraryUsageDescription": "Flik uses your photo library when you choose media for a post or profile."
+      }
+    },
+    "android": {
+      "package": "com.flik.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF"
+      },
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO"
+      ]
+    }
+  }
+}

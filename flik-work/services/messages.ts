@@ -1,0 +1,9 @@
+import { supabase } from '../lib/supabase';
+export async function listConversations(userId:string){return supabase.from('conversation_members').select('conversation_id,conversations(id,created_at,updated_at,last_message_at,conversation_members(profile_id,profiles:profile_id(id,username,full_name,avatar_path)),messages(id,content,sender_id,created_at,read_at))').eq('profile_id',userId);}
+export async function findOrCreateConversation(_userId:string,otherId:string){return supabase.rpc('get_or_create_direct_conversation',{other_user_id:otherId});}
+export async function listMessages(conversationId:string){return supabase.from('messages').select('id,conversation_id,sender_id,content,created_at,read_at').eq('conversation_id',conversationId).order('created_at',{ascending:true});}
+export async function sendMessage(conversationId:string,senderId:string,content:string){return supabase.from('messages').insert({conversation_id:conversationId,sender_id:senderId,content}).select().single();}
+export async function markConversationRead(conversationId:string,userId:string){const {data:members}=await supabase.from('conversation_members').select('profile_id').eq('conversation_id',conversationId);if(!(members||[]).some(x=>x.profile_id===userId))return {error:new Error('Not a conversation member')} as any;return supabase.from('messages').update({read_at:new Date().toISOString()}).eq('conversation_id',conversationId).neq('sender_id',userId).is('read_at',null);}
+export async function createGame(conversationId:string,opponentId:string){return supabase.rpc('create_tictactoe_game',{p_conversation_id:conversationId,p_opponent_id:opponentId});}
+export async function getGame(id:string){return supabase.from('tictactoe_games').select('*').eq('id',id).single();}
+export async function moveGame(id:string,cell:number){return supabase.rpc('make_tictactoe_move',{p_game_id:id,p_cell:cell});}

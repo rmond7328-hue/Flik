@@ -1,0 +1,2 @@
+import { useInfiniteQuery } from '@tanstack/react-query'; import { fetchFeed,PAGE_SIZE } from '../services/feed';
+export function useFeed(campusId?:string,userId?:string){return useInfiniteQuery({queryKey:['feed',campusId,userId],enabled:!!campusId,initialPageParam:0,queryFn:({pageParam})=>fetchFeed(campusId!,pageParam,pageParam+PAGE_SIZE-1,userId),getNextPageParam:(last,pages)=>!last.data||last.data.length<PAGE_SIZE?undefined:pages.length*PAGE_SIZE});}

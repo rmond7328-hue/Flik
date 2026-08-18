@@ -1,0 +1,2 @@
+import { useInfiniteQuery } from '@tanstack/react-query'; import { fetchFollowingFeed,PAGE_SIZE } from '../services/feed';
+export function useFollowingFeed(userId?:string){return useInfiniteQuery({queryKey:['following-feed',userId],enabled:!!userId,initialPageParam:0,queryFn:({pageParam})=>fetchFollowingFeed(userId!,pageParam,pageParam+PAGE_SIZE-1),getNextPageParam:(last,pages)=>!last.data||last.data.length<PAGE_SIZE?undefined:pages.length*PAGE_SIZE});}

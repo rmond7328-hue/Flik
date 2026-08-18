@@ -1,0 +1,3 @@
+import { Image, Text, View } from 'react-native';
+import { publicStorageUrl } from '../lib/media';
+export function Avatar({uri,name,size=46}:{uri?:string|null;name?:string|null;size?:number}){const source=uri?.startsWith('http')?uri:publicStorageUrl('avatars',uri);return <View style={{width:size,height:size,borderRadius:size/2,backgroundColor:'#E8F2FF',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>{source?<Image source={{uri:source}} style={{width:'100%',height:'100%'}}/>:<Text style={{fontWeight:'900',fontSize:size*.34,color:'#2563EB'}}>{(name||'F').trim().slice(0,1).toUpperCase()}</Text>}</View>}

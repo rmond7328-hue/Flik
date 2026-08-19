@@ -14,7 +14,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_DEV_BYPASS_AUTH": "true"
+        "EXPO_PUBLIC_DEV_BYPASS_AUTH": "false"
       }
     },
     "production": {

@@ -6,6 +6,12 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "scheme": "flik",
+    "icon": "./assets/flik-icon.png",
+    "splash": {
+      "image": "./assets/flik-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
     "plugins": [
       "expo-router",
       "expo-font",
@@ -25,7 +31,8 @@
     "android": {
       "package": "com.flik.app",
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/flik-icon.png",
+        "backgroundColor": "#000000"
       },
       "permissions": [
         "CAMERA",

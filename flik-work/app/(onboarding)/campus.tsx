@@ -1,53 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
-import { router } from 'expo-router';
-import { useAuthStore } from '../../stores/auth-store';
-import { listCampuses, listCities, listCountries } from '../../services/campus';
-import { supabase } from '../../lib/supabase';
-
-export default function CampusSetup() {
-  const user = useAuthStore((s) => s.user);
-  const [countries, setCountries] = useState<string[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
-  const [campuses, setCampuses] = useState<any[]>([]);
-  const [country, setCountry] = useState('');
-  const [city, setCity] = useState('');
-  const [campusId, setCampusId] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => { listCountries().then(({ data }) => setCountries([...new Set((data ?? []).map((x: any) => x.country))])); }, []);
-  async function chooseCountry(value: string) {
-    setCountry(value); setCity(''); setCampusId(''); setCampuses([]);
-    const { data } = await listCities(value);
-    setCities([...new Set((data ?? []).map((x: any) => x.city))]);
-  }
-  async function chooseCity(value: string) {
-    setCity(value); setCampusId('');
-    const { data } = await listCampuses(country, value);
-    setCampuses(data ?? []);
-  }
-  async function next() {
-    if (!user || !campusId) return Alert.alert('Choose your campus', 'Select a campus to continue.');
-    setBusy(true);
-    const { error } = await supabase.from('profiles').update({ campus_id: campusId }).eq('id', user.id);
-    setBusy(false);
-    if (error) return Alert.alert('Could not save campus', error.message);
-    router.push('/(onboarding)/interests');
-  }
-
-  return <ScrollView contentContainerStyle={{ padding: 24, paddingTop: 70, gap: 14 }}>
-    <Text style={{ fontSize: 32, fontWeight: '800' }}>Where do you study?</Text>
-    <Text style={{ color: '#6B7280' }}>Your campus shapes what you see on Flik.</Text>
-    <Text style={label}>Country</Text>
-    <View style={wrap}>{countries.map((x) => <Pressable key={x} onPress={() => chooseCountry(x)} style={[chip, country === x && selected]}><Text>{x}</Text></Pressable>)}</View>
-    {!!country && <><Text style={label}>City</Text><View style={wrap}>{cities.map((x) => <Pressable key={x} onPress={() => chooseCity(x)} style={[chip, city === x && selected]}><Text>{x}</Text></Pressable>)}</View></>}
-    {!!city && <><Text style={label}>Campus</Text><View style={wrap}>{campuses.map((x) => <Pressable key={x.id} onPress={() => setCampusId(x.id)} style={[chip, campusId === x.id && selected]}><Text>{x.name}</Text></Pressable>)}</View></>}
-    <Pressable onPress={next} disabled={busy} style={button}><Text style={buttonText}>{busy ? 'Saving…' : 'Continue'}</Text></Pressable>
-  </ScrollView>;
-}
-const label = { fontWeight: '700' as const, marginTop: 10 };
-const wrap = { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: 8 };
-const chip = { paddingHorizontal: 14, paddingVertical: 11, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 999 };
-const selected = { backgroundColor: '#DBEAFE', borderColor: '#60A5FA' };
-const button = { height: 52, borderRadius: 14, backgroundColor: '#60A5FA', alignItems: 'center' as const, justifyContent: 'center' as const, marginTop: 16 };
-const buttonText = { color: '#fff', fontSize: 16, fontWeight: '700' as const };
+import { useEffect,useState } from 'react'; import { Alert,Pressable,ScrollView,StyleSheet,Text,View } from 'react-native'; import { router } from 'expo-router'; import { MapPin } from 'lucide-react-native'; import { useAuthStore } from '../../stores/auth-store'; import { listCampuses,listCities,listCountries } from '../../services/campus'; import { supabase } from '../../lib/supabase'; import { colors,radius,spacing,type } from '../../constants/theme';
+export default function CampusSetup(){const user=useAuthStore(s=>s.user);const[countries,setCountries]=useState<string[]>([]);const[cities,setCities]=useState<string[]>([]);const[campuses,setCampuses]=useState<any[]>([]);const[country,setCountry]=useState('');const[city,setCity]=useState('');const[campusId,setCampusId]=useState('');const[busy,setBusy]=useState(false);useEffect(()=>{listCountries().then(({data})=>setCountries([...new Set((data??[]).map((x:any)=>x.country))]))},[]);async function chooseCountry(v:string){setCountry(v);setCity('');setCampusId('');setCampuses([]);const{data}=await listCities(v);setCities([...new Set((data??[]).map((x:any)=>x.city))])}async function chooseCity(v:string){setCity(v);setCampusId('');const{data}=await listCampuses(country,v);setCampuses(data??[])}async function next(){if(!user||!campusId)return Alert.alert('Choose your campus','Select a campus to continue.');setBusy(true);const{error}=await supabase.from('profiles').update({campus_id:campusId}).eq('id',user.id);setBusy(false);if(error)return Alert.alert('Could not save campus',error.message);router.push('/(onboarding)/interests')}
+const Chip=({label,value,onPress,active}:{label:string,value:string,onPress:()=>void,active:boolean})=><Pressable onPress={onPress} style={[styles.chip,active&&styles.selected]}><Text style={[styles.chipText,active&&styles.selectedText]}>{label}</Text></Pressable>;
+return <ScrollView style={styles.page} contentContainerStyle={styles.content}><View style={styles.progress}><View style={styles.done}/><View style={styles.active}/><View/></View><Text style={styles.eyebrow}>STEP 2 OF 3</Text><Text style={styles.title}>Where do you study?</Text><Text style={styles.subtitle}>Your campus shapes what you see on Flik. We’ll use it to personalize your feed and communities.</Text><View style={styles.icon}><MapPin size={25} color={colors.accentStrong}/></View><Text style={styles.label}>Country</Text><View style={styles.wrap}>{countries.map(x=><Chip key={x} label={x} value={x} onPress={()=>chooseCountry(x)} active={country===x}/>)}</View>{!!country&&<><Text style={styles.label}>City</Text><View style={styles.wrap}>{cities.map(x=><Chip key={x} label={x} value={x} onPress={()=>chooseCity(x)} active={city===x}/>)}</View></>}{!!city&&<><Text style={styles.label}>Campus</Text><View style={styles.wrap}>{campuses.map(x=><Chip key={x.id} label={x.name} value={x.id} onPress={()=>setCampusId(x.id)} active={campusId===x.id}/>)}</View></>}<Pressable onPress={next} disabled={busy||!campusId} style={[styles.button,(!campusId||busy)&&styles.disabled]}><Text style={styles.buttonText}>{busy?'Saving…':'Continue'}</Text></Pressable></ScrollView>}
+const styles=StyleSheet.create({page:{flex:1,backgroundColor:colors.background},content:{padding:spacing.lg,paddingTop:58,paddingBottom:40},progress:{height:4,borderRadius:4,backgroundColor:colors.surfaceStrong,flexDirection:'row',overflow:'hidden',marginBottom:spacing.xl},done:{flex:1,backgroundColor:colors.accentStrong},active:{flex:1,backgroundColor:colors.accent},eyebrow:{...type.meta,color:colors.accentStrong,letterSpacing:1.1},title:{...type.display,color:colors.text,marginTop:7},subtitle:{...type.body,color:colors.muted,marginTop:9},icon:{width:52,height:52,borderRadius:16,backgroundColor:colors.accentSoft,alignItems:'center',justifyContent:'center',marginTop:spacing.lg},label:{...type.label,color:colors.text,marginTop:spacing.lg,marginBottom:8},wrap:{flexDirection:'row',flexWrap:'wrap',gap:8},chip:{paddingHorizontal:14,paddingVertical:11,borderWidth:1,borderColor:colors.border,borderRadius:radius.pill,backgroundColor:colors.white},selected:{backgroundColor:colors.accentSoft,borderColor:colors.accentStrong},chipText:{...type.body,color:colors.text},selectedText:{color:colors.accentStrong,fontFamily:'DMSans_700Bold'},button:{height:54,borderRadius:radius.md,backgroundColor:colors.accentStrong,alignItems:'center',justifyContent:'center',marginTop:spacing.xl},buttonText:{...type.button,color:colors.white},disabled:{opacity:.45}});

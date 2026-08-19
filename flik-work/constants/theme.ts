@@ -1,12 +1,12 @@
 export const colors = {
   background: '#FFFFFF',
-  surface: '#F7F8FA',
-  surfaceStrong: '#F1F3F5',
+  surface: '#F5F5F5',
+  surfaceStrong: '#EEEEEE',
   text: '#111111',
   textSoft: '#27272A',
   muted: '#6B7280',
   subtle: '#9CA3AF',
-  border: '#E8EAED',
+  border: '#E5E7EB',
   accent: '#60A5FA',
   accentStrong: '#3B82F6',
   accentSoft: '#EAF4FF',
@@ -17,7 +17,6 @@ export const colors = {
   overlay: 'rgba(0,0,0,0.58)',
 } as const;
 
-// Flik uses an 8-point spacing rhythm. Keep new UI aligned to these values.
 export const spacing = {
   xxs: 4,
   xs: 8,

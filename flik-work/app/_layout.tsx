@@ -48,6 +48,9 @@ export default function RootLayout() {
     const inAuth = first === '(auth)';
     const inOnboarding = first === '(onboarding)';
     const inTabs = first === '(tabs)';
+    const inCallback = first === 'callback';
+
+    if (inCallback) return;
     if (DEV_BYPASS_AUTH) { if (!inTabs) router.replace('/(tabs)/home'); return; }
     if (!session && !inAuth) router.replace('/(auth)/login');
     else if (session && needsOnboarding && !inOnboarding) router.replace('/(onboarding)/profile');

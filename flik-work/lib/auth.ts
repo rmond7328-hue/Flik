@@ -23,6 +23,10 @@ export async function exchangeAuthCode(code: string) {
 export async function verifyMagicLink(tokenHash: string) {
   return supabase.auth.verifyOtp({
     token_hash: tokenHash,
-    type: 'magiclink',
+    type: 'email',
   });
+}
+
+export async function setAuthSession(accessToken: string, refreshToken: string) {
+  return supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
 }

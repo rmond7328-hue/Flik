@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { exchangeAuthCode, verifyMagicLink } from '../lib/auth';
+import { exchangeAuthCode, setAuthSession, verifyMagicLink } from '../lib/auth';
 import { colors, type } from '../constants/theme';
 
 export default function AuthCallback() {
-  const params = useLocalSearchParams<{ code?: string; token_hash?: string; error_description?: string }>();
+  const params = useLocalSearchParams<{
+    code?: string;
+    token_hash?: string;
+    access_token?: string;
+    refresh_token?: string;
+    error_description?: string;
+  }>();
   const [message, setMessage] = useState('Signing you in securely…');
 
   useEffect(() => {
@@ -15,6 +21,8 @@ export default function AuthCallback() {
       try {
         const code = typeof params.code === 'string' ? params.code : '';
         const tokenHash = typeof params.token_hash === 'string' ? params.token_hash : '';
+        const accessToken = typeof params.access_token === 'string' ? params.access_token : '';
+        const refreshToken = typeof params.refresh_token === 'string' ? params.refresh_token : '';
         const errorDescription = typeof params.error_description === 'string' ? params.error_description : '';
 
         if (errorDescription) throw new Error(errorDescription);
@@ -23,7 +31,9 @@ export default function AuthCallback() {
           ? await exchangeAuthCode(code)
           : tokenHash
             ? await verifyMagicLink(tokenHash)
-            : null;
+            : accessToken && refreshToken
+              ? await setAuthSession(accessToken, refreshToken)
+              : null;
 
         if (!result) throw new Error('This sign-in link is missing or incomplete. Request a new link from Flik.');
         if (result.error) throw result.error;
@@ -41,7 +51,7 @@ export default function AuthCallback() {
 
     complete();
     return () => { mounted = false; };
-  }, [params.code, params.token_hash, params.error_description]);
+  }, [params.code, params.token_hash, params.access_token, params.refresh_token, params.error_description]);
 
   return (
     <View style={styles.page}>

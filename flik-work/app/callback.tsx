@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import * as Linking from 'expo-linking';
 import { exchangeAuthCode, verifyMagicLink } from '../lib/auth';
 import { colors, type } from '../constants/theme';
 
 export default function AuthCallback() {
-  const params = useLocalSearchParams<{ code?: string; token_hash?: string; type?: string; error_description?: string }>();
+  const params = useLocalSearchParams<{ code?: string; token_hash?: string; error_description?: string }>();
   const [message, setMessage] = useState('Signing you in securely…');
 
   useEffect(() => {
@@ -14,16 +13,18 @@ export default function AuthCallback() {
 
     async function complete() {
       try {
-        const url = await Linking.getInitialURL();
-        const parsed = url ? Linking.parse(url) : null;
-        const query = parsed?.queryParams ?? {};
-        const code = String(params.code ?? query.code ?? '');
-        const tokenHash = String(params.token_hash ?? query.token_hash ?? '');
-        const errorDescription = String(params.error_description ?? query.error_description ?? '');
+        const code = typeof params.code === 'string' ? params.code : '';
+        const tokenHash = typeof params.token_hash === 'string' ? params.token_hash : '';
+        const errorDescription = typeof params.error_description === 'string' ? params.error_description : '';
 
         if (errorDescription) throw new Error(errorDescription);
 
-        const result = code ? await exchangeAuthCode(code) : tokenHash ? await verifyMagicLink(tokenHash) : null;
+        const result = code
+          ? await exchangeAuthCode(code)
+          : tokenHash
+            ? await verifyMagicLink(tokenHash)
+            : null;
+
         if (!result) throw new Error('This sign-in link is missing or incomplete. Request a new link from Flik.');
         if (result.error) throw result.error;
 

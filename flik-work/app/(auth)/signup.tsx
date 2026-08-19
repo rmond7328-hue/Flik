@@ -1,36 +1,13 @@
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
+import { Mail } from 'lucide-react-native';
 import { signUp } from '../../lib/auth';
+import { colors, radius, spacing, type } from '../../constants/theme';
 
 export default function Signup() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  async function submit() {
-    if (!/^\S+@\S+\.\S+$/.test(email) || password.length < 8) return Alert.alert('Check your details', 'Use a valid email and a password of at least 8 characters.');
-    setBusy(true);
-    const { data, error } = await signUp(email.trim(), password);
-    setBusy(false);
-    if (error) return Alert.alert('Sign up failed', error.message);
-    if (data.session) router.replace('/(onboarding)/profile');
-    else router.replace({ pathname: '/otp', params: { email: email.trim() } });
-  }
-
-  return <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-    <View style={{ flex: 1, padding: 24, justifyContent: 'center', gap: 14 }}>
-      <Text style={{ fontSize: 42, fontWeight: '800' }}>flik</Text>
-      <Text style={{ fontSize: 28, fontWeight: '700' }}>Join Flik.</Text>
-      <Text style={{ color: '#6B7280' }}>Start with your campus community.</Text>
-      <TextInput placeholder="Email" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} style={input} />
-      <TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} style={input} />
-      <Pressable onPress={submit} disabled={busy} style={button}><Text style={buttonText}>{busy ? 'Creating…' : 'Create account'}</Text></Pressable>
-      <Pressable onPress={() => router.back()}><Text style={link}>Already have an account? Log in</Text></Pressable>
-    </View>
-  </KeyboardAvoidingView>;
+  const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [busy, setBusy] = useState(false);
+  async function submit() { if (!/^\S+@\S+\.\S+$/.test(email) || password.length < 8) return Alert.alert('Check your details', 'Use a valid email and a password of at least 8 characters.'); setBusy(true); const { data, error } = await signUp(email.trim(), password); setBusy(false); if (error) return Alert.alert('Sign up failed', error.message); if (data.session) router.replace('/(onboarding)/profile'); else router.replace({ pathname: '/otp', params: { email: email.trim() } }); }
+  return <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.page}><View style={styles.container}><Image source={require('../../assets/flik-icon.png')} style={styles.logo} resizeMode="contain" /><Text style={styles.kicker}>JOIN YOUR CAMPUS.</Text><Text style={styles.title}>Join Flik.</Text><Text style={styles.subtitle}>Create your campus identity and start sharing moments.</Text><View style={styles.card}><Text style={styles.label}>Email</Text><View style={styles.inputWrap}><Mail size={18} color={colors.muted} /><TextInput placeholder="you@example.com" placeholderTextColor={colors.subtle} autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} style={styles.input} /></View><Text style={[styles.label, { marginTop: 12 }]}>Password</Text><TextInput placeholder="Create a password" placeholderTextColor={colors.subtle} secureTextEntry value={password} onChangeText={setPassword} style={styles.password} /><Pressable onPress={submit} disabled={busy} style={[styles.button, busy && { opacity: .65 }]}><Text style={styles.buttonText}>{busy ? 'Creating…' : 'Create account'}</Text></Pressable></View><Pressable onPress={() => router.back()} style={styles.footer}><Text style={styles.footerText}>Already on Flik? <Text style={styles.link}>Log in</Text></Text></Pressable></View></KeyboardAvoidingView>;
 }
-const input = { height: 52, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 14, paddingHorizontal: 16, fontSize: 16 };
-const button = { height: 52, borderRadius: 14, backgroundColor: '#60A5FA', alignItems: 'center' as const, justifyContent: 'center' as const };
-const buttonText = { color: '#fff', fontSize: 16, fontWeight: '700' as const };
-const link = { textAlign: 'center' as const, color: '#2563EB', fontWeight: '600' as const };
+const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: colors.background }, container: { flex: 1, padding: spacing.lg, justifyContent: 'center' }, logo: { width: 74, height: 74, alignSelf: 'center', marginBottom: 20, borderRadius: 18 }, kicker: { ...type.meta, color: colors.accentStrong, fontFamily: 'DMSans_700Bold', letterSpacing: 1.2, textAlign: 'center' }, title: { ...type.display, color: colors.text, textAlign: 'center', marginTop: 5 }, subtitle: { ...type.body, color: colors.muted, textAlign: 'center', marginTop: 8, marginHorizontal: 18 }, card: { marginTop: spacing.xl, padding: spacing.md, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }, label: { ...type.label, color: colors.text, marginBottom: 7 }, inputWrap: { height: 52, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, backgroundColor: colors.white, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 8 }, input: { flex: 1, fontFamily: 'DMSans_400Regular', fontSize: 15, color: colors.text }, password: { height: 52, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, backgroundColor: colors.white, paddingHorizontal: 14, fontFamily: 'DMSans_400Regular', fontSize: 15, color: colors.text }, button: { height: 52, borderRadius: radius.md, backgroundColor: colors.accentStrong, alignItems: 'center', justifyContent: 'center', marginTop: spacing.md }, buttonText: { ...type.button, color: colors.white, fontSize: 15 }, footer: { alignItems: 'center', marginTop: spacing.lg }, footerText: { ...type.body, color: colors.muted }, link: { color: colors.accentStrong, fontFamily: 'DMSans_700Bold' }, });

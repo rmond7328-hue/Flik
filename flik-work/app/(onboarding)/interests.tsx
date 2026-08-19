@@ -1,36 +1,3 @@
-import { useEffect, useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
-import { router } from 'expo-router';
-import { useAuthStore } from '../../stores/auth-store';
-import { listInterests, saveInterests } from '../../services/campus';
-
-export default function Interests() {
-  const user = useAuthStore((s) => s.user);
-  const [items, setItems] = useState<any[]>([]);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => { listInterests().then(({ data }) => setItems(data ?? [])); }, []);
-  function toggle(id: string) {
-    setSelected((current) => current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
-  }
-  async function finish() {
-    if (!user || selected.length < 1) return Alert.alert('Pick an interest', 'Choose at least one interest so we can personalize your campus feed.');
-    setBusy(true);
-    const { error } = await saveInterests(user.id, selected);
-    setBusy(false);
-    if (error) return Alert.alert('Could not save interests', error.message);
-    router.replace('/(tabs)/home');
-  }
-
-  return <View style={{ flex: 1, padding: 24, paddingTop: 70, gap: 14 }}>
-    <Text style={{ fontSize: 32, fontWeight: '800' }}>What are you into?</Text>
-    <Text style={{ color: '#6B7280' }}>Pick a few things you want to see around campus.</Text>
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 }}>{items.map((x) => <Pressable key={x.id} onPress={() => toggle(x.id)} style={[chip, selected.includes(x.id) && active]}><Text style={{ fontWeight: '600' }}>{x.name}</Text></Pressable>)}</View>
-    <Pressable onPress={finish} disabled={busy} style={button}><Text style={buttonText}>{busy ? 'Finishing…' : 'Enter Flik'}</Text></Pressable>
-  </View>;
-}
-const chip = { paddingHorizontal: 15, paddingVertical: 12, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 999 };
-const active = { backgroundColor: '#DBEAFE', borderColor: '#60A5FA' };
-const button = { height: 52, borderRadius: 14, backgroundColor: '#60A5FA', alignItems: 'center' as const, justifyContent: 'center' as const, marginTop: 'auto' as any };
-const buttonText = { color: '#fff', fontSize: 16, fontWeight: '700' as const };
+import { useEffect,useState } from 'react'; import { Alert,Pressable,ScrollView,StyleSheet,Text,View } from 'react-native'; import { router } from 'expo-router'; import { Sparkles } from 'lucide-react-native'; import { useAuthStore } from '../../stores/auth-store'; import { listInterests,saveInterests } from '../../services/campus'; import { colors,radius,spacing,type } from '../../constants/theme';
+export default function Interests(){const user=useAuthStore(s=>s.user);const[items,setItems]=useState<any[]>([]);const[selected,setSelected]=useState<string[]>([]);const[busy,setBusy]=useState(false);useEffect(()=>{listInterests().then(({data})=>setItems(data??[]))},[]);function toggle(id:string){setSelected(c=>c.includes(id)?c.filter(x=>x!==id):[...c,id])}async function finish(){if(!user||selected.length<1)return Alert.alert('Pick an interest','Choose at least one interest so we can personalize your campus feed.');setBusy(true);const{error}=await saveInterests(user.id,selected);setBusy(false);if(error)return Alert.alert('Could not save interests',error.message);router.replace('/(tabs)/home')};return <ScrollView style={styles.page} contentContainerStyle={styles.content}><View style={styles.progress}><View style={styles.done}/><View style={styles.done}/><View style={styles.active}/></View><Text style={styles.eyebrow}>STEP 3 OF 3</Text><Text style={styles.title}>What are you into?</Text><Text style={styles.subtitle}>Pick a few things you want to see around campus. You can change these later.</Text><View style={styles.icon}><Sparkles size={24} color={colors.accentStrong}/></View><View style={styles.grid}>{items.map(x=><Pressable key={x.id} onPress={()=>toggle(x.id)} style={[styles.chip,selected.includes(x.id)&&styles.selected]}><Text style={[styles.chipText,selected.includes(x.id)&&styles.selectedText]}>{x.name}</Text>{selected.includes(x.id)?<Text style={styles.check}>✓</Text>:null}</Pressable>)}</View><Text style={styles.count}>{selected.length} selected</Text><Pressable onPress={finish} disabled={busy||!selected.length} style={[styles.button,(!selected.length||busy)&&styles.disabled]}><Text style={styles.buttonText}>{busy?'Finishing…':'Enter Flik'}</Text></Pressable></ScrollView>}
+const styles=StyleSheet.create({page:{flex:1,backgroundColor:colors.background},content:{padding:spacing.lg,paddingTop:58,paddingBottom:40},progress:{height:4,borderRadius:4,backgroundColor:colors.surfaceStrong,flexDirection:'row',overflow:'hidden',marginBottom:spacing.xl},done:{flex:1,backgroundColor:colors.accentStrong},active:{flex:1,backgroundColor:colors.accent},eyebrow:{...type.meta,color:colors.accentStrong,letterSpacing:1.1},title:{...type.display,color:colors.text,marginTop:7},subtitle:{...type.body,color:colors.muted,marginTop:9},icon:{width:52,height:52,borderRadius:16,backgroundColor:colors.accentSoft,alignItems:'center',justifyContent:'center',marginTop:spacing.lg,marginBottom:spacing.md},grid:{flexDirection:'row',flexWrap:'wrap',gap:10},chip:{paddingHorizontal:15,paddingVertical:12,borderWidth:1,borderColor:colors.border,borderRadius:radius.pill,backgroundColor:colors.white,flexDirection:'row',alignItems:'center',gap:7},selected:{backgroundColor:colors.accentSoft,borderColor:colors.accentStrong},chipText:{...type.bodyMedium,color:colors.text},selectedText:{color:colors.accentStrong},check:{color:colors.accentStrong,fontFamily:'DMSans_700Bold'},count:{...type.meta,color:colors.muted,marginTop:14},button:{height:54,borderRadius:radius.md,backgroundColor:colors.accentStrong,alignItems:'center',justifyContent:'center',marginTop:spacing.xl},buttonText:{...type.button,color:colors.white},disabled:{opacity:.45}});

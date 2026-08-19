@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Bell, Search } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -54,7 +54,7 @@ export default function Home() {
       ref={listRef}
       data={data}
       keyExtractor={item => item.id}
-      contentContainerStyle={{ paddingHorizontal: spacing.md, paddingBottom: 24, gap: 14, flexGrow: 1 }}
+      contentContainerStyle={styles.feedContent}
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) => <PostCard post={item} currentUserId={user?.id} liked={!!liked[item.id]} onLike={() => like(item.id)} />}
       refreshControl={refresh ? <RefreshControl refreshing={feed.isRefetching} onRefresh={refresh} tintColor={colors.accentStrong} /> : undefined}
@@ -63,33 +63,45 @@ export default function Home() {
         if (tab === 'following' && following.hasNextPage && !following.isFetchingNextPage) following.fetchNextPage();
       }}
       onEndReachedThreshold={0.4}
-      ListHeaderComponent={loading ? <View style={{ gap: 14, paddingTop: 4 }}>{[1, 2, 3].map(x => <Skeleton key={x} height={310} radius={radius.lg} />)}</View> : null}
+      ListHeaderComponent={loading ? <View style={styles.skeletonList}>{[1, 2, 3].map(x => <Skeleton key={x} height={310} radius={radius.lg} />)}</View> : null}
       ListEmptyComponent={!loading ? <EmptyState title={tab === 'following' ? 'Your following feed is quiet' : 'Be the first to post'} message={tab === 'following' ? 'Follow more students to build your feed.' : 'Share what is happening on campus.'} /> : null}
-      ListFooterComponent={(feed.isFetchingNextPage || following.isFetchingNextPage) ? <ActivityIndicator style={{ padding: 20 }} color={colors.accentStrong} /> : null}
+      ListFooterComponent={(feed.isFetchingNextPage || following.isFetchingNextPage) ? <ActivityIndicator style={styles.footerLoader} color={colors.accentStrong} /> : null}
     />
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top + 8 }}>
-      <View style={{ paddingHorizontal: spacing.md }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', height: 46 }}>
-          <Text style={{ ...type.display, color: colors.accentStrong, letterSpacing: -1.2 }}>flik</Text>
-          <View style={{ flex: 1 }} />
-          <Pressable accessibilityLabel="Search" hitSlop={10} onPress={() => setTab('discover')} style={{ padding: 8 }}>
-            <Search size={21} color={colors.text} strokeWidth={2.2} />
-          </Pressable>
-          <Pressable accessibilityLabel="Notifications" hitSlop={10} onPress={() => router.push('/notifications')} style={{ padding: 8, marginLeft: 2 }}>
-            <Bell size={21} color={colors.text} strokeWidth={2.2} />
-          </Pressable>
+    <View style={[styles.screen, { paddingTop: insets.top }]}>
+      <View style={styles.header}>
+        <View style={styles.brandRow}>
+          <Text style={styles.logo}>flik</Text>
+          <View style={styles.headerActions}>
+            <Pressable accessibilityLabel="Search" hitSlop={10} onPress={() => setTab('discover')} style={styles.headerButton}>
+              <Search size={21} color={colors.text} strokeWidth={2.2} />
+            </Pressable>
+            <Pressable accessibilityLabel="Notifications" hitSlop={10} onPress={() => router.push('/notifications')} style={styles.headerButton}>
+              <Bell size={21} color={colors.text} strokeWidth={2.2} />
+            </Pressable>
+          </View>
         </View>
-        <View style={{ marginTop: 4, marginBottom: 12 }}>
-          <TopTabs value={tab} onChange={setTab} />
-        </View>
+        <TopTabs value={tab} onChange={setTab} />
       </View>
 
       {tab === 'discover' ? (
-        <View style={{ flex: 1, paddingHorizontal: spacing.md }}><DiscoverView /></View>
+        <View style={styles.discover}><DiscoverView /></View>
       ) : renderFeed(tab === 'following' ? followingPosts : posts, tab === 'following' ? following.isPending : feed.isPending, () => feed.refetch())}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.background },
+  header: { paddingHorizontal: spacing.md, paddingTop: spacing.sm },
+  brandRow: { height: 50, flexDirection: 'row', alignItems: 'center' },
+  logo: { ...type.display, color: colors.accentStrong, letterSpacing: -1.5 },
+  headerActions: { flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 2 },
+  headerButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  feedContent: { paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: 28, gap: spacing.md, flexGrow: 1 },
+  skeletonList: { gap: spacing.md, paddingTop: 2 },
+  footerLoader: { paddingVertical: spacing.lg },
+  discover: { flex: 1, paddingHorizontal: spacing.md, paddingTop: spacing.md },
+});

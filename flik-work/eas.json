@@ -5,6 +5,8 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://nbwtbmyrmeazmrckpfqi.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_aQ9PDUbqBUuv7Y0QoyhajA_32n1VfAN",
         "EXPO_PUBLIC_DEV_BYPASS_AUTH": "true"
       }
     },
@@ -14,6 +16,8 @@
         "buildType": "apk"
       },
       "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://nbwtbmyrmeazmrckpfqi.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_aQ9PDUbqBUuv7Y0QoyhajA_32n1VfAN",
         "EXPO_PUBLIC_DEV_BYPASS_AUTH": "false"
       }
     },
@@ -22,6 +26,8 @@
         "buildType": "app-bundle"
       },
       "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://nbwtbmyrmeazmrckpfqi.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_aQ9PDUbqBUuv7Y0QoyhajA_32n1VfAN",
         "EXPO_PUBLIC_DEV_BYPASS_AUTH": "false"
       }
     }
